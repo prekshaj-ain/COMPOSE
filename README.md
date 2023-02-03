@@ -36,5 +36,5 @@ Compose Blog is designed to be simple and intuitive, allowing users to focus on 
 
 ## Feedback
 
-If you have any feedback, please reach out to us at jainpareksha2712@gmail.com
+If you have any feedback, please reach out to us at jainpreksha2712@gmail.com
 
