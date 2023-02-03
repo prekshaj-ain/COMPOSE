@@ -2,8 +2,9 @@ const express = require('express');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 const app = express();
-const postRoute = require('./Routes/post-route')
+const postRoute = require('./Routes/post-route');
 const userRoute = require('./Routes/user-route');
+const searchRoute = require('./Routes/search-route');
 const httpError = require('./Models/http-error');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -12,8 +13,9 @@ app.use(cookieParser());
 dotenv.config();
 app.use(bodyParser.json());
 app.use('/api',express.static('uploads'));
-app.use('/api/post',express.static('uploads'), postRoute)
-app.use('/api/user',express.static('uploads'), userRoute)
+app.use('/api/post',express.static('uploads'), postRoute);
+app.use('/api/user',express.static('uploads'), userRoute);
+app.use('/api/search',searchRoute);
 app.use((req,res,next)=>{
     const error = new httpError("couldn't find this route",404 );
     return next(error);
