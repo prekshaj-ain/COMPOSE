@@ -4,5 +4,5 @@ const router = express.Router();
 
 router.get('/',search);
 router.get('/user',searchUser);
-router.get('/post',searchPost)
+router.get('/post',searchPost);
 module.exports  = router;
