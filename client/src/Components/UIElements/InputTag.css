@@ -1,14 +1,4 @@
-.inputTag{
-    width: 100%;
-    height: 50px;
-    border: .5px solid lightgray;
-    padding: 5px;
-    font-size: 14px;
-    outline: none;
-    gap: 5px;
-    display: flex;
-    align-items: center;
-}
+
 .tagInput{
     border-radius: 30px;
     background-color: lightgray;

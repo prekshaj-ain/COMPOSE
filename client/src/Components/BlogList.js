@@ -6,8 +6,8 @@ function BlogList(props) {
   return (
     <Section className="posts">
       {props.heading && <h1 className="heading">{props.heading}</h1>}
-      {props.posts && props.posts.map((post) => (
-        
+      {props.posts.length === 0 && <h3 className="heading">Nothing to show</h3>}
+      {props.posts.length !== 0 && props.posts.map((post) => (
         <BlogItem
           key={post.id}
           id={post.id}

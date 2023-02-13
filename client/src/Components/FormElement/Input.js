@@ -20,8 +20,9 @@ function Input(props) {
             pattern={props.pattern}
             focused={focused.toString()}
             onChange = {props.onChange}
+            onInput={props.onInput}
             name={props.name}
-            value={props.value}
+            value={props.value || ""}
             checked={props.checked}
             maxLength={props.maxlength}
         /> :
@@ -34,7 +35,7 @@ function Input(props) {
             placeholder={props.placeholder}
             onChange = {props.onChange}
             name={props.name}
-            value={props.value}
+            value={props.value || ""}
 
         />
   return (

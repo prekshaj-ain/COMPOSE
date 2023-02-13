@@ -51,12 +51,12 @@ const login = async (req,res,next)=>{
     token = jwt.sign({
         userId: existingUser.id,
         email: existingUser.email
-    }, process.env.SECRET, {expiresIn: '1h'});
+    }, process.env.SECRET, {expiresIn: '20h'});
    }catch(err){
     return next(new httpError('could not log you in, please try again later',500));
    }
    res.cookie("access_token", token , {
-    expires: new Date(Date.now() + (7 * 24 * 3600 * 1000)) ,
+    expires: new Date(Date.now() + (20 * 3600 * 1000)) ,
     httpOnly : true
    }).status(200).json({userId: existingUser.id, email: existingUser.email })
 }
@@ -70,9 +70,9 @@ const logout = (req,res,next)=>{
 
 }
 const signup = async (req,res,next)=>{
-    const errors = validationResult(req);
+    const errors = validationResult(req).formatWith(({msg}) => msg);
     if(!errors.isEmpty()){
-        return next(new httpError('Invalid value',422));
+        return next(new httpError(errors.array(),422));
     }
     let existingUser;
     try{
@@ -107,15 +107,42 @@ const signup = async (req,res,next)=>{
         token = jwt.sign({
             userId: newUser.id,
             email: newUser.email
-        }, process.env.SECRET, {expiresIn: '1h'});
+        }, process.env.SECRET, {expiresIn: '20h'});
     }catch(err){
         return next(new httpError('signup failed, please try again later',500));
     }
 
     res.cookie("access_token" , token , {
-        expires: new Date(Date.now() + (7 * 24 * 3600 * 1000)) ,
+        expires: new Date(Date.now() + (20 * 3600 * 1000)) ,
         httpOnly: true
     }).status(201).json({userId: newUser.id , email: newUser.email})
+}
+const updateUser = async (req,res,next)=>{
+    const error = validationResult(req).formatWith(({msg}) => msg);
+    if(!error.isEmpty()){
+        return next(new httpError(error.array(),422));
+    }
+    const uid = req.params.uid;
+    let user;
+    try{
+        user = await User.findById(uid);
+        if(user){
+            try{
+                user = await User.findByIdAndUpdate(uid,{
+                    ...req.body,
+                    image: req.file ? req.file.filename : ""
+                });
+                await user.save();
+            }catch(err){
+                return next(new httpError('Something went wrong, Could not update the user',500));
+            }
+        }else{
+            return next(new httpError('User does not exist',400))
+        }
+    }catch(err){
+        return next(new httpError('something went wrong, Couldnt update the user',500));
+    }
+    res.status(200).json({message:"user updated successfully"});
 }
 
 module.exports.login = login;
@@ -123,3 +150,4 @@ module.exports.logout = logout;
 module.exports.signup = signup;
 module.exports.getUsers = getUsers;
 module.exports.getUser = getUser;
+module.exports.updateUser = updateUser;

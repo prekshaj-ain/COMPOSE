@@ -21,7 +21,7 @@ function RecommendPost(props) {
           <p>{props.title}</p>
         </Link>
       </div>
-      {props.isImage && 
+      {(props.isImage && props.image) && 
       <div className="recommendPost--image">
       <Image className="img" src={props.image}/>
       </div>}

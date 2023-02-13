@@ -105,7 +105,9 @@
     color: black;
 }
 
-
+.content-img{
+    width: 110px;
+}
 .content-img > .img{
     width: 110px;
     height: 110px;

@@ -11,7 +11,7 @@ function RecommendBlogList(props) {
             <h5><span className='Trending'><TrendingUpIcon fontSize='small'/></span>Trending on Compose</h5>
             <div className="trendingPosts">
             {
-                posts.map(post =>(
+                posts.slice(0,5).map(post =>(
                     <RecommendPost 
                         key={post.id}
                         id={post.id}

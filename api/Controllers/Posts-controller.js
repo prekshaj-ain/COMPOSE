@@ -63,20 +63,23 @@ const getPosts = async (req, res, next) => {
     .json({ posts: posts.map((post) => post.toObject({ getters: true })), catInsight });
 };
 const updatePost = async (req, res, next) => {
-  const errors = validationResult(req);
+  const errors = validationResult(req).formatWith(({msg}) => msg);
   if (!errors.isEmpty()) {
-    return next(new httpError(errors.msg, 422));
+    return next(new httpError(errors.array(), 422));
   }
   const postId = req.params.id;
-
   let post;
   try {
     post = await Post.findById(postId);
     if (post.author.toString() === req.userData.userId) {
+      const cat = req.body.categories.split(",");
       try {
         post = await Post.findByIdAndUpdate(postId, {
-          ...req.body,
+          title: req.body.title,
+          description: req.body.description,
           image: req.file && req.file.filename,
+          author: req.userData.userId,
+          categories: [...cat],
         });
         await post.save();
       } catch (err) {
@@ -127,9 +130,9 @@ const deletePost = async (req, res, next) => {
   res.status(200).json({ message: "post deleted successfully" });
 };
 const createPost = async (req, res, next) => {
-  const errors = validationResult(req);
+  const errors = validationResult(req).formatWith(({msg}) => msg);
   if (!errors.isEmpty()) {
-    return next(new httpError("title, description cannot be empty", 422));
+    return next(new httpError(errors.array(), 422));
   }
 
   let user;
@@ -138,12 +141,13 @@ const createPost = async (req, res, next) => {
   } catch (err) {
     return next(new httpError(err, 500));
   }
+  const cat = req.body.categories.split(',')
   const newPost = new Post({
     title: req.body.title,
     description: req.body.description,
     image: req.file && req.file.filename,
     author: req.userData.userId,
-    categories: req.body.categories,
+    categories: [...cat],
   });
   
   if (!user) {
@@ -158,10 +162,10 @@ const createPost = async (req, res, next) => {
     await user.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
-    return next(new httpError("Creating post failed, Please try again", 500));
+    return next(new httpError(err, 500));
   }
 
-  res.status(201).json({ post: newPost });
+  res.status(201).json({ post: newPost.toObject({getters: true}) });
 };
 
 module.exports.createPost = createPost;

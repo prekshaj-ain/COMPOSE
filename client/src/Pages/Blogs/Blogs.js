@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import BlogList from "../../Components/BlogList";
-import axios from "axios";
+import axios from "../../instance";
 import "./Blogs.css";
 import { useLocation } from "react-router-dom";
 import RecommendBlogList from "../../Components/RecommendBlogList";
@@ -10,7 +10,6 @@ import Skeleton from "../../Components/UIElements/Skeleton";
 import Aside from "../../Components/UIElements/Aside";
 function Blogs() {
   const [Posts, setPosts] = useState([]);
-  
   const [loading, setLoading] = useState(true);
   const [insight, setInsight] = useState({});
   const { search } = useLocation();

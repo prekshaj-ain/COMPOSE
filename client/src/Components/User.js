@@ -1,13 +1,8 @@
-import React, { useContext } from 'react'
-import axios from 'axios'
+import React from 'react'
 import Image from './UIElements/Image'
 import './User.css'
-import { useHistory } from 'react-router-dom';
-import { AuthContext } from './Context/auth-context';
 import { Link } from 'react-router-dom';
 function User(props) {
-  const auth = useContext(AuthContext)
-  const history = useHistory();
   return (
     <div className='user'>
         <Image className="user-img" src={props.profile} />

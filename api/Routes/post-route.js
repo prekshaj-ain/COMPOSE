@@ -12,19 +12,23 @@ router.use(verifyToken)
 router.post('/', upload.single('image'),
     [check('title')
         .not()
-        .isEmpty(),
+        .isEmpty()
+        .withMessage('Title should not be empty '),
     check('description')
         .not()
         .isEmpty()
+        .withMessage('Description should not be empty.')
     ]
     , createPost);
-router.put('/:id', upload.single('image'),
+router.patch('/:id', upload.single('image'),
     [check('title')
         .not()
-        .isEmpty(),
+        .isEmpty()
+        .withMessage('Title should not be empty '),
     check('description')
         .not()
         .isEmpty()
+        .withMessage('Description should not be empty ')
     ]
     , updatePost);
 router.delete('/:id', deletePost);

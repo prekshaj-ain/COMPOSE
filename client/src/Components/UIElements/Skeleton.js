@@ -1,7 +1,7 @@
 import { CircularProgress } from '@mui/material';
 import React from 'react'
 import './Skeleton.css'
-export default function Skeleton({type}) {
+export default function Skeleton({type, className}) {
     const COUNTER = 3;
     const FeedSkeleton = ()=>(
         <div className="postSk">
@@ -43,7 +43,7 @@ export default function Skeleton({type}) {
         return (<Single />)
     }
     if(type === 'spinner'){
-        return (<RecommendFeed />)
+        return (<RecommendFeed className={className}/>)
     }
 }
 

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../../instance';
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import BlogList from '../../Components/BlogList';
@@ -13,7 +13,6 @@ function UserBlog() {
   const path = location.pathname.split("/")[2];
   const [posts,setPosts] = useState({});
   const [user,setUser] = useState({});
-  const [ userLoading,setUserLoading] = useState(true);
   const [loading,setLoading] = useState(true);
   useEffect(()=>{
     const fetchPost = async ()=>{
@@ -27,8 +26,6 @@ function UserBlog() {
     const fetchUser = async ()=>{
         const res = await axios.get('/user/'+ path);
         setUser(res.data.user);
-        console.log(res.data.user);
-        setUserLoading(false);
     }
     fetchUser();
   },[path])
@@ -46,7 +43,7 @@ function UserBlog() {
                 id={user.id}
                 username={user.username}
                 image={user.image}
-                desc={user.about}
+                about={user.about}
             />
       </Aside>
       

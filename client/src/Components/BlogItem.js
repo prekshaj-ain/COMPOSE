@@ -9,11 +9,9 @@ import Button from './FormElement/Button';
 import { useContext } from "react";
 import { AuthContext } from "./Context/auth-context";
 import Modal from "./UIElements/Modal";
-import axios from "axios";
-import { useHistory } from "react-router-dom";
+import axios from "../instance";
 function BlogItem(props) {
   const auth = useContext(AuthContext);
-  const history = useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const openHandler = () => {
@@ -32,12 +30,11 @@ function BlogItem(props) {
   const confirmDeleteHandler = async ()=>{
     setShowDeleteModal(false);
     try{
-      await axios.delete('/post/delete/'+ props.id);
-      history.push('/');
+      await axios.delete('/post/'+ props.id);
+      auth.refresh();
     }catch(err){
       console.log(err.message)
     }
-  
   }
   let { title, desc } = props;
   desc = desc.replace(/<\/?[^>]+>/gi, "");
@@ -80,7 +77,7 @@ function BlogItem(props) {
           <div className="MoreDetails">
             <Tag style={{ fontSize: ".6rem" }}>{props.categories[0]}</Tag>
             {auth.user === props.uid && (
-              <React.Fragment>
+              <>
                 <MoreHorizIcon className="details" onClick={openHandler} />
                 <div className={isOpen ? "menu" : "menu none"}>
                   <Link
@@ -91,12 +88,12 @@ function BlogItem(props) {
                   </Link>
                   <p onClick={showModalHandler}>Delete</p>
                 </div>
-              </React.Fragment>
+              </>
             )}
           </div>
         </div>
         <div className="content-img">
-          <Image src={props.image} className="img" />
+          {props.image && <Image src={props.image} className="img" />}
         </div>
       </div>
     </>

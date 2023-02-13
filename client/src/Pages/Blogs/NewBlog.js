@@ -7,18 +7,25 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.bubble.css";
 import "../../Components/TextEditor.css";
 import "./NewBlog.css";
-import axios from "axios";
+import axios from "../../instance";
 import { useHistory, useLocation } from "react-router-dom";
 import Modal from "../../Components/UIElements/Modal";
 import BackDrop from "../../Components/UIElements/BackDrop";
 import CloseIcon from "@mui/icons-material/Close";
 import "../../Components/UIElements/InputTag.css";
+import Skeleton from "../../Components/UIElements/Skeleton";
 function NewBlog() {
   const [user, setUser] = useState();
   const [openModal, setOpenModal] = useState(false);
   const history = useHistory();
   const postId = useLocation().search.split("=")[1];
   const auth = useContext(AuthContext);
+  const [title, setTitle] = useState("");
+  const [des, setDes] = useState("");
+  const [cat, setCat] = useState([]);
+  const [file, setFile] = useState(null);
+  const [preview,setPreview] = useState();
+  const [loading,setLoading] = useState(false);
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -30,6 +37,15 @@ function NewBlog() {
     };
     fetchUser();
   }, [auth.user]);
+  const fileHandler = (e)=>{
+    setFile(e.target.files[0]);
+    setPreview(URL.createObjectURL(e.target.files[0]));
+  }
+  const InputHandler = (e)=>{ 
+    e.target.style.height = '45px';
+    e.target.style.height = `${e.target.scrollHeight}px`
+    setTitle(e.target.value)
+  }
   useEffect(() => {
     if (postId) {
       const fetchPost = async () => {
@@ -37,18 +53,17 @@ function NewBlog() {
         setTitle(res.data.post.title);
         setDes(res.data.post.description);
         setCat(res.data.post.categories);
+        setFile(res.data.post.image);
+        setPreview(`${process.env.REACT_APP_BACKEND_URL}/${res.data.post.image}`);
       };
       fetchPost();
-    } else {
+    }else{
       setTitle("");
-      setDes("");
-      setCat([]);
+        setDes("");
+        setCat([]);
+        setFile("");
     }
   }, [postId]);
-  const [title, setTitle] = useState("");
-  const [des, setDes] = useState("");
-  const [cat, setCat] = useState([]);
-  const [file, setFile] = useState(null);
   const desVal = des.replace(/<\/?[^>]+>/gi, "");
   let isEmpty = !title || !desVal;
   const openModalHandler = () => {
@@ -58,6 +73,7 @@ function NewBlog() {
     setOpenModal(false);
   };
   const clickHandler = async () => {
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("image", file);
@@ -65,10 +81,12 @@ function NewBlog() {
       formData.append("description", des);
       formData.append("categories", cat);
       const res = postId
-        ? await axios.put("/post/" + postId, formData)
+        ? await axios.patch("/post/" + postId, formData)
         : await axios.post("/post/", formData);
+        setLoading(false);
       history.push("/post/"+res.data.post.id);
     } catch (err) {
+      setLoading(false);
       console.log(err);
     }
   };
@@ -87,7 +105,7 @@ function NewBlog() {
     if(cat.length === 5){
         return;
     }
-    setCat([...cat, e.target.value]);
+    setCat([...cat, e.target.value.toLowerCase()]);
     e.target.value = "";
   };
 
@@ -106,12 +124,13 @@ function NewBlog() {
               Publish
             </Button>
           >
+            {loading && <Skeleton type="spinner"/>}
             <h5>Publishing to: {user}</h5>
             <p style={{ color: "#666" }}>
               Add Topics (up to 5) so readers can know what your story is about.
             </p>
             <div className="inputTag">
-              {cat.map((tag, index) => (
+              {cat && cat.map((tag, index) => (
                 <div className="tagInput" key={index}>
                   <p>{tag}</p>
                   <CloseIcon
@@ -133,10 +152,10 @@ function NewBlog() {
         </React.Fragment>
       )}
       <div className="new-blog">
-        {!!file && (
+        {file && (
           <img
             className="newBlog--Image"
-            src={URL.createObjectURL(file)}
+            src={preview}
             alt=""
           />
         )}
@@ -149,17 +168,15 @@ function NewBlog() {
               type="file"
               style={{ display: "none" }}
               labelStyle={{ cursor: "pointer" }}
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={fileHandler}
             />
-            <div
+            <textarea
               className="title-input"
-              contentEditable
-              onChange={(e) => {
-                setTitle(e.target.value);
-              }}
-            >
-              {title}
-            </div>
+              onChange={InputHandler}
+              placeholder="Title"
+              rows={3}
+              value={title}
+            />
           </div>
           <div className="editor">
             <ReactQuill
@@ -184,6 +201,7 @@ function NewBlog() {
         </Button>
       </div>
     </React.Fragment>
+
   );
 }
 

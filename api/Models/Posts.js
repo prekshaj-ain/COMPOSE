@@ -17,10 +17,10 @@ const postSchema = new mongoose.Schema({
         required:true,
         ref: 'User'
     },
-    categories:{
-        type:Array,
+    categories:[{
+        type: String,
         required:false
-    }
+    }]
 },{timestamps:true});
 
 module.exports = mongoose.model('Post',postSchema);

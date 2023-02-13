@@ -16,6 +16,7 @@
     text-decoration: none;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
 }
 .options > *:hover, .logout:hover{
     color: #352044;

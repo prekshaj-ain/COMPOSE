@@ -11,7 +11,7 @@ const search = async (req,res,next)=>{
                 {username:{$regex: query,$options:'i'}},
                 {about:{$regex: query,$options:'i'}}
             ]
-        }).limit(3);
+        },'-password -email').limit(3);
         postData = await Post.find({
             "$or":[
                 {title:{$regex: query,$options:'i'}},
@@ -29,21 +29,21 @@ const search = async (req,res,next)=>{
 } 
 const searchUser = async  (req,res,next)=>{
     const query = req.query.q;
-    let UserData;
+    let userData;
     try{
-        UserData = await User.find({
+        userData = await User.find({
             "$or": [
                 {username:{$regex: query,$options:'i'}},
                 {about:{$regex: query,$options:'i'}}
             ]
-        })
+        }, '-password -email')
     } catch(err){
         return next(new httpError('could not search please try again later',500));
     }
-    if(UserData.length === 0){
+    if(userData.length === 0){
         return next(new httpError('no matches found',404));
     }
-    res.status(200).json(UserData);
+    res.status(200).json(userData.map((user) => user.toObject({ getters: true })));
 
 }
 const searchPost = async (req,res,next)=>{
@@ -55,14 +55,14 @@ const searchPost = async (req,res,next)=>{
                 {title:{$regex: query,$options:'i'}},
                 {description:{$regex: query,$options:'i'}}
             ]
-        })
+        }).populate("author", '-password -email')
     }catch(err){
         return next(new httpError('could not search please try again later',500));
     }
     if(postData.length === 0){
         return next(new httpError('no matches found',404));
     }
-    res.status(200).json(postData);
+    res.status(200).json(postData.map((post) => post.toObject({ getters: true })));
 
 
 }
